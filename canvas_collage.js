@@ -386,7 +386,7 @@ function image_manager(canvas_id, background_url, foreground_urls) {
             mouseX = max_x;
         }
         if (mouseY > max_y) {
-            mouseX = max_y;
+            mouseY = max_y;
         }
 
         obj.redraw_canvas();
