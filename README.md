@@ -1,8 +1,8 @@
 # Canvas Collage
 This is a simple, self-contained vanilla JavaScript object-oriented implementation (without using classes) of a collage maker 
-that enables supplying a parameter for the url of a statiuc background image and a parameter of the list of urls for the foreground images which can be dragged and resized.
+that enables supplying a parameter for the url of a static background image and a parameter of the list of urls for the foreground images which can be dragged and resized.
 
-# Self contained example
+# Self-contained example
 Code is better than words:
 
 ```html
@@ -33,3 +33,5 @@ Code is better than words:
     </body>
 <html>
 ```
+# Demo
+See the result of the above code  [here](https://fixpix.net/canvas_collage.html)
