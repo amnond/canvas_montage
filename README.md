@@ -33,4 +33,4 @@ Code is better than words:
 <html>
 ```
 # Demo
-See the result of the above code  [here](https://fixpix.net/canvas_collage.html)
+See the result of the above code  [here](https://fixpix.net/canvas_montage.html)
