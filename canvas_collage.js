@@ -12,7 +12,6 @@ function draggable_image(imngr, img_url, init_x, init_y) {
     var m_rr = m_resizerRadius * m_resizerRadius;
     var m_draggingResizer = -1;
     var m_draggingImage = null;
-    var m_imgLoadState = "wait";
     var m_canvas = imngr.get_canvas();
     var m_mngr = imngr;
     var m_ctx = m_canvas.getContext("2d");
@@ -23,9 +22,11 @@ function draggable_image(imngr, img_url, init_x, init_y) {
     var m_height = 100;
     var m_right = 0;
     var m_bottom = 0;
-    var m_img = new Image()    
+    var m_img = new Image()
     var m_startX = m_imageX;
     var m_startY = m_imageY;
+
+    var obj = {};
 
     m_img.onload = function() {
         m_width = m_img.width;
@@ -35,14 +36,11 @@ function draggable_image(imngr, img_url, init_x, init_y) {
         m_img_ar = m_width / m_height;
         
         m_ctx.drawImage(m_img, m_imageX, m_imageY);
-        if (m_imgLoadState == 'wait') {
-            m_img.src = img_url;
-            m_imgLoadState = 'downloading';
-        }
+        m_mngr.on_image_loaded(obj)
         m_mngr.redraw_canvas();
-        
     }
-    m_img.src = 'loader.svg';
+    
+    m_img.src = img_url;
 
     function getFilename(url) {
         let urlObject = new URL(url);
@@ -71,8 +69,6 @@ function draggable_image(imngr, img_url, init_x, init_y) {
         retval = {'width':new_width, 'height':new_height};
         return retval;
     }
-
-    var obj = {};
 
     //----------------------------------------------------------------------------------------------
     obj.get_id = function() {
@@ -256,12 +252,43 @@ function image_manager(canvas_id, background_url, foreground_urls) {
     var m_canvas = document.getElementById(canvas_id);
     var m_ctx = m_canvas.getContext("2d");
     var m_main_image = new Image();
-    var m_main_image_state = 'none'
     var m_images = [];
+    var m_total_images_loaded = 0;
 
+    function drawText(strText, x, y, custom) {
+        var def = {
+            'font_size':15,
+            'font_family':'Arial',
+            'text_color':'blue',
+            'background_color':'yellow',
+            'border_color':'blue',
+            'line_width':1
+        }
+        if (typeof(def)=='object') {
+            for (key in custom) {
+                if (key in def) {
+                    def[key] = custom[key];
+                }
+            }
+        }
+        m_ctx.font = `${def.font_size}px ${def.font_family}`;
+        m_ctx.fillStyle = def.background_color;
+        var width = m_ctx.measureText(strText).width;
+        var pad = 10;
+        [rx, ry, rw, rh] = [x-pad, y-def.font_size-pad, width+pad*2, def.font_size+pad*2];
+        m_ctx.fillRect(rx, ry, rw, rh);
+        m_ctx.fillStyle = def.text_color;
+        m_ctx.fillText(strText, x, y);
+        m_ctx.strokeStyle = def.border_color;
+        m_ctx.lineWidth = def.line_width;
+        m_ctx.strokeRect(rx, ry, rw, rh);
+    }
+
+    drawText('loading background...', m_canvas.width/2, m_canvas.height/2);
+    
     function draw_background_image() {
-        m_ctx.canvas.width = m_main_image.width;
-        m_ctx.canvas.height = m_main_image.height;
+        m_canvas.width = m_main_image.width;
+        m_canvas.height = m_main_image.height;
         m_ctx.drawImage(m_main_image, 0, 0, m_main_image.width, m_main_image.height);
     }
     
@@ -271,7 +298,7 @@ function image_manager(canvas_id, background_url, foreground_urls) {
             top: rect.top + window.scrollY,
             left: rect.left + window.scrollX
         };
-    }    
+    }
 
     var obj = {};
 
@@ -297,19 +324,22 @@ function image_manager(canvas_id, background_url, foreground_urls) {
 
     m_main_image.onload = function() {
         draw_background_image();
-        if (m_main_image_state == 'none') {
-            // loader image has been displayed, request actual background image
-            m_main_image.src = background_url;
-            m_main_image_state = 'getting_background';
-            return;
-        }
+        
         // Actual background image has been displayed, create foreground images
         for (var i=0; i<foreground_urls.length; i++) {
             var offset = (i+2)*30
             m_images.push(draggable_image(obj, foreground_urls[i], offset, offset));
+            drawText('loading image...', offset, offset);
         }
     }
 
+    obj.on_image_loaded = function(image) {
+        m_total_images_loaded++;
+        if (m_total_images_loaded == m_images.length) {
+            init_event_handlers();
+        }
+    }
+    
     obj.handleMouseDown = function(e) {
         var canvasOffset = getCanvasOffset();
         var offsetX = canvasOffset.left;
@@ -420,8 +450,7 @@ function image_manager(canvas_id, background_url, foreground_urls) {
         focused_image.draw(true, true) ;
     }
 
-    function init() {
-        m_main_image.src = "loader.svg"; // put a local loader image as the background image
+    function init_event_handlers() {
         m_canvas.ontouchstart = function(e){
             e.preventDefault();
             var touch = e.touches[0]; // Get the first touch
@@ -464,7 +493,7 @@ function image_manager(canvas_id, background_url, foreground_urls) {
         };
     }
 
-    init();
+    m_main_image.src = background_url;
     return obj;
 }
 

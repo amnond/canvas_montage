@@ -8,11 +8,10 @@ Code is better than words:
 ```html
 <!DOCTYPE html>
 <html>
-    <body onLoad='init()'>
     <head>
         <script type="text/javascript" src="./canvas_collage.js"></script>
     </head>
-
+    <body onLoad='init()'>
     <canvas style='border:black solid 1px;' id="canvas"></canvas>
     <script type="text/javascript">
     function init() {
