@@ -1,4 +1,4 @@
-# Canvas Collage
+# Canvas Montage
 This is a simple, self-contained vanilla JavaScript object-oriented implementation (without using classes) of a collage maker 
 that enables supplying a parameter for the url of a static background image and a parameter of the list of urls for the foreground images which can be dragged and resized.
 
@@ -9,7 +9,7 @@ Code is better than words:
 <!DOCTYPE html>
 <html>
     <head>
-        <script type="text/javascript" src="./canvas_collage.js"></script>
+        <script type="text/javascript" src="./canvas_montage.js"></script>
     </head>
     <body onLoad='init()'>
     <canvas style='border:black solid 1px;' id="canvas"></canvas>
